@@ -12,11 +12,7 @@ Sometimes you need to measure replication lag between a primary and one or more 
 
 Interval unit is milliseconds (`-interval`).
 
-`pgbeat` relies on `libpq` for PostgreSQL connection:
-* when `-host` is ommited, connection via unix socket is used
-* when `-user` is ommited, the unix user is used
-* default `-database` is `postgres`
-* `-password` is optional
+`pgbeat` relies on `libpq` for PostgreSQL connection. When `-host` is ommited, connection via unix socket is used. When `-user` is ommited, the unix user is used. And so on.
 
 You will have to use CTRL+C (SIGINT) or kill (SIGTERM) to terminate `pgbeat`.
 
