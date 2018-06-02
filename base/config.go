@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 )
 
+// AppName exposes application name to config module
+var AppName string
+
 // Config receives configuration options
 type Config struct {
 	File     string
@@ -20,6 +23,10 @@ type Config struct {
 	Interval int    `yaml:"interval"`
 	Timeout  int    `yaml:"timeout"`
 	ID       int    `yaml:"id"`
+}
+
+func init() {
+	AppName = "pgbeat"
 }
 
 // NewConfig creates a Config object
@@ -67,6 +74,9 @@ func (c *Config) Dsn() string {
 	}
 	if c.Timeout != 0 {
 		dsn += fmt.Sprintf("connect_timeout=%d ", c.Timeout)
+	}
+	if AppName != "" {
+		dsn += fmt.Sprintf("application_name=%s", AppName)
 	}
 	return dsn
 }
