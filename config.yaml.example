@@ -1,0 +1,10 @@
+---
+host: 127.0.0.1
+port: 5432
+user: test
+password: ****
+database: test
+schema: public
+table: pgbeat
+id: 1
+interval: 1000
