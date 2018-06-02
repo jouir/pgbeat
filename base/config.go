@@ -18,6 +18,7 @@ type Config struct {
 	Schema   string `yaml:"schema"`
 	Table    string `yaml:"table"`
 	Interval int    `yaml:"interval"`
+	Timeout  int    `yaml:"timeout"`
 	ID       int    `yaml:"id"`
 }
 
@@ -63,6 +64,9 @@ func (c *Config) Dsn() string {
 	}
 	if c.Database != "" {
 		dsn += fmt.Sprintf("dbname=%s ", c.Database)
+	}
+	if c.Timeout != 0 {
+		dsn += fmt.Sprintf("connect_timeout=%d ", c.Timeout)
 	}
 	return dsn
 }

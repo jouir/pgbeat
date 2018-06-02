@@ -26,6 +26,7 @@ func main() {
 	flag.StringVar(&config.Schema, "schema", "public", "Schema name")
 	flag.StringVar(&config.Table, "table", "pgbeat", "Table name")
 	flag.IntVar(&config.Interval, "interval", 1000, "Time to sleep between updates in milliseconds")
+	flag.IntVar(&config.Timeout, "timeout", 3, "Connection timeout in seconds")
 	flag.IntVar(&config.ID, "id", 1, "Differenciate daemons by using an indentifier")
 	flag.Parse()
 
