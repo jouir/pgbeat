@@ -12,10 +12,14 @@ import (
 	"syscall"
 )
 
+// AppVersion stores application version at compilation time
+var AppVersion string
+
 func main() {
 	var err error
 	config := base.NewConfig()
 
+	version := flag.Bool("version", false, "Print version")
 	flag.StringVar(&config.File, "config", "", "Configuration file")
 	flag.StringVar(&config.Host, "host", "", "Instance host address")
 	flag.IntVar(&config.Port, "port", 0, "Instance port")
@@ -29,6 +33,14 @@ func main() {
 	flag.IntVar(&config.Timeout, "timeout", 3, "Connection timeout in seconds")
 	flag.IntVar(&config.ID, "id", 1, "Differenciate daemons by using an indentifier")
 	flag.Parse()
+
+	if *version {
+		if AppVersion == "" {
+			AppVersion = "unknown"
+		}
+		fmt.Println(AppVersion)
+		return
+	}
 
 	if *prompt {
 		fmt.Print("Password: ")
