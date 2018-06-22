@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 )
 
 // AppName exposes application name to config module
@@ -55,27 +56,27 @@ func (c *Config) Read(file string) error {
 
 // Dsn formats a connection string based on Config
 func (c *Config) Dsn() string {
-	var dsn string
+	var dsn []string
 	if c.Host != "" {
-		dsn += fmt.Sprintf("host=%s ", c.Host)
+		dsn = append(dsn, fmt.Sprintf("host=%s", c.Host))
 	}
 	if c.Port != 0 {
-		dsn += fmt.Sprintf("port=%d ", c.Port)
+		dsn = append(dsn, fmt.Sprintf("port=%d", c.Port))
 	}
 	if c.User != "" {
-		dsn += fmt.Sprintf("user=%s ", c.User)
+		dsn = append(dsn, fmt.Sprintf("user=%s", c.User))
 	}
 	if c.Password != "" {
-		dsn += fmt.Sprintf("password=%s ", c.Password)
+		dsn = append(dsn, fmt.Sprintf("password=%s", c.Password))
 	}
 	if c.Database != "" {
-		dsn += fmt.Sprintf("dbname=%s ", c.Database)
+		dsn = append(dsn, fmt.Sprintf("dbname=%s", c.Database))
 	}
 	if c.Timeout != 0 {
-		dsn += fmt.Sprintf("connect_timeout=%d ", c.Timeout)
+		dsn = append(dsn, fmt.Sprintf("connect_timeout=%d", c.Timeout))
 	}
 	if AppName != "" {
-		dsn += fmt.Sprintf("application_name=%s", AppName)
+		dsn = append(dsn, fmt.Sprintf("application_name=%s", AppName))
 	}
-	return dsn
+	return strings.Join(dsn, " ")
 }
