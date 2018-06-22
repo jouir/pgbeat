@@ -87,3 +87,11 @@ func (db *Db) UpdateBeat(table Table, serverID int) {
 	_, err := db.conn.Exec(query, serverID)
 	Panic(err)
 }
+
+// InRecovery checks if instance is in recovery mode (read-only)
+func (db *Db) InRecovery() (recovery bool) {
+	query := "select pg_is_in_recovery();"
+	err := db.conn.QueryRow(query).Scan(&recovery)
+	Panic(err)
+	return recovery
+}

@@ -5,16 +5,16 @@ Sometimes you need to measure replication lag between a primary and one or more 
 
 ## Internals
 
-`pgbeat` behavior is like a heartbeat system. It updates a given row at a given interval of time with the current timestamp.
+`pgbeat` behavior is like a heartbeat system. It updates a given row at a given interval of time with the current timestamp. `pgbeat` works with replicas too. As soon as connected instance gets promoted, it will automatically start to update heartbeat.
 
 ## Highlights
 `pgbeat` uses an identifier (`-id`) associated with its timestamp so multiple daemons can run at the same time on the same instance without overlap.
 
-Interval unit is milliseconds (`-interval`).
+Interval unit is seconds (`-interval`, `-recovery-interval`, `-timeout`). Milliseconds can be set using floating point value (ex: 0.25 for 250ms), except for `-timeout` where only integers are accepted.
 
 `pgbeat` relies on `libpq` for PostgreSQL connection. When `-host` is ommited, connection via unix socket is used. When `-user` is ommited, the unix user is used. And so on.
 
-You will have to use CTRL+C (SIGINT) or kill (SIGTERM) to terminate `pgbeat`.
+`pgbeat` handles `SIGINT` and `SIGTERM` signals.
 
 Configuration file options **override** command-line arguments.
 
@@ -29,7 +29,7 @@ pgbeat -config config.yaml
 ```
 Use both configuration file and command-line arguments:
 ```
-pgbeat -config config.yaml -id 2 -interval 500
+pgbeat -config config.yaml -id 2 -interval 0.5
 ```
 Print usage:
 ```

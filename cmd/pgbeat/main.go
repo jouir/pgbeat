@@ -32,6 +32,7 @@ func main() {
 	flag.Float64Var(&config.Interval, "interval", 1, "Time to sleep between updates in seconds")
 	flag.IntVar(&config.Timeout, "timeout", 3, "Connection timeout in seconds")
 	flag.IntVar(&config.ID, "id", 1, "Differenciate daemons by using an indentifier")
+	flag.Float64Var(&config.RecoveryInterval, "recovery-interval", 1, "Time to wait between recovery checks in seconds")
 	flag.Parse()
 
 	if *version {

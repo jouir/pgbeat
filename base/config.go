@@ -13,16 +13,17 @@ var AppName string
 
 // Config receives configuration options
 type Config struct {
-	Host     string  `yaml:"host"`
-	Port     int     `yaml:"port"`
-	User     string  `yaml:"user"`
-	Password string  `yaml:"password"`
-	Database string  `yaml:"database"`
-	Schema   string  `yaml:"schema"`
-	Table    string  `yaml:"table"`
-	Interval float64 `yaml:"interval"`
-	Timeout  int     `yaml:"timeout"`
-	ID       int     `yaml:"id"`
+	Host             string  `yaml:"host"`
+	Port             int     `yaml:"port"`
+	User             string  `yaml:"user"`
+	Password         string  `yaml:"password"`
+	Database         string  `yaml:"database"`
+	Schema           string  `yaml:"schema"`
+	Table            string  `yaml:"table"`
+	Interval         float64 `yaml:"interval"`
+	Timeout          int     `yaml:"timeout"`
+	ID               int     `yaml:"id"`
+	RecoveryInterval float64 `yaml:"recovery-interval"`
 }
 
 func init() {

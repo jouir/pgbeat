@@ -8,9 +8,10 @@ import (
 
 // Beatmaker manages beats sent to the instance
 type Beatmaker struct {
-	config *base.Config
-	db     *base.Db
-	beat   bool
+	config   *base.Config
+	db       *base.Db
+	beat     bool
+	recovery bool
 }
 
 // NewBeatmaker creates a Beatmaker manager
@@ -29,6 +30,17 @@ func (bm *Beatmaker) Run() {
 	bm.db.Connect()
 	defer bm.db.Disconnect()
 
+	// Initial recovery check
+	bm.recovery = bm.db.InRecovery()
+
+	// Further recovery checks in asynchronous mode
+	go func() {
+		for {
+			bm.recovery = bm.db.InRecovery()
+			time.Sleep(time.Duration(bm.config.RecoveryInterval*1000) * time.Millisecond)
+		}
+	}()
+
 	if !bm.db.TableExists(table) {
 		log.Println("Creating table", table)
 		bm.db.CreateTable(table)
@@ -37,13 +49,17 @@ func (bm *Beatmaker) Run() {
 	bm.beat = bm.db.BeatExists(table, bm.config.ID)
 
 	for {
-		if bm.beat {
-			log.Println("Updating beat")
-			bm.db.UpdateBeat(table, bm.config.ID)
+		if bm.recovery {
+			log.Println("Not inserting beat (recovery mode)")
 		} else {
-			log.Println("Inserting beat")
-			bm.db.InsertBeat(table, bm.config.ID)
-			bm.beat = true
+			if bm.beat {
+				log.Println("Updating beat")
+				bm.db.UpdateBeat(table, bm.config.ID)
+			} else {
+				log.Println("Inserting beat")
+				bm.db.InsertBeat(table, bm.config.ID)
+				bm.beat = true
+			}
 		}
 		time.Sleep(time.Duration(bm.config.Interval*1000) * time.Millisecond)
 	}
