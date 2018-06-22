@@ -45,7 +45,7 @@ func (bm *Beatmaker) Run() {
 			bm.db.InsertBeat(table, bm.config.ID)
 			bm.beat = true
 		}
-		time.Sleep(time.Duration(bm.config.Interval) * time.Millisecond)
+		time.Sleep(time.Duration(bm.config.Interval*1000) * time.Millisecond)
 	}
 }
 
