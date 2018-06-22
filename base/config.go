@@ -12,7 +12,6 @@ var AppName string
 
 // Config receives configuration options
 type Config struct {
-	File     string
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
 	User     string `yaml:"user"`

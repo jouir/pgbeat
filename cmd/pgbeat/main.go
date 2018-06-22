@@ -20,7 +20,7 @@ func main() {
 	config := base.NewConfig()
 
 	version := flag.Bool("version", false, "Print version")
-	flag.StringVar(&config.File, "config", "", "Configuration file")
+	configFile := flag.String("config", "", "Configuration file")
 	flag.StringVar(&config.Host, "host", "", "Instance host address")
 	flag.IntVar(&config.Port, "port", 0, "Instance port")
 	flag.StringVar(&config.User, "user", "", "Instance username")
@@ -50,8 +50,8 @@ func main() {
 		fmt.Print("\n")
 	}
 
-	if config.File != "" {
-		err = config.Read(config.File)
+	if *configFile != "" {
+		err = config.Read(*configFile)
 		base.Panic(err)
 	}
 
