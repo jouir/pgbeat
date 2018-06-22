@@ -9,8 +9,8 @@ type Table struct {
 }
 
 // NewTable creates a Table object
-func NewTable(schema string, name string) Table {
-	return Table{
+func NewTable(schema string, name string) *Table {
+	return &Table{
 		Schema: schema,
 		Name:   name,
 	}

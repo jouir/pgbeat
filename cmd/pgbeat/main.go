@@ -56,7 +56,8 @@ func main() {
 		base.Panic(err)
 	}
 
-	beatmaker := manager.NewBeatmaker(config)
+	done := make(chan bool)
+	beatmaker := manager.NewBeatmaker(config, done)
 
 	// Signal handling
 	c := make(chan os.Signal, 1)
@@ -66,8 +67,7 @@ func main() {
 	go func() {
 		for sig := range c {
 			log.Printf("Received %v signal\n", sig)
-			beatmaker.Terminate()
-			os.Exit(0)
+			done <- true
 		}
 	}()
 
