@@ -61,6 +61,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
+	signal.Notify(c, syscall.SIGINT)
 	go func() {
 		for sig := range c {
 			log.Printf("Received %v signal\n", sig)
