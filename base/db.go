@@ -2,6 +2,7 @@ package base
 
 import (
 	"database/sql"
+	"fmt"
 	// Force database/sql to use libpq
 	_ "github.com/lib/pq"
 )
@@ -54,7 +55,7 @@ func (db *Db) TableExists(table Table) bool {
 // CreateTable initializes table structure on instance
 func (db *Db) CreateTable(table Table) {
 	if !db.TableExists(table) {
-		query := `create table ` + table.String() + ` (id bigint primary key, ts timestamptz not null);`
+		query := fmt.Sprintf("create table %s (id bigint primary key, ts timestamptz not null);", table)
 		_, err := db.conn.Exec(query)
 		Panic(err)
 	}
@@ -63,7 +64,7 @@ func (db *Db) CreateTable(table Table) {
 // BeatExists checks for beat existance
 func (db *Db) BeatExists(table Table, serverID int) bool {
 	var exists bool
-	query := `select true as result from ` + table.String() + ` where id = $1 limit 1;`
+	query := fmt.Sprintf("select true as result from %s where id = $1 limit 1;", table)
 	err := db.conn.QueryRow(query, serverID).Scan(&exists)
 	if err == sql.ErrNoRows {
 		exists = false
@@ -75,14 +76,14 @@ func (db *Db) BeatExists(table Table, serverID int) bool {
 
 // InsertBeat insert a beat into the table
 func (db *Db) InsertBeat(table Table, serverID int) {
-	query := `insert into ` + table.String() + ` (id, ts) values ($1, now());`
+	query := fmt.Sprintf("insert into %s (id, ts) values ($1, now());", table)
 	_, err := db.conn.Exec(query, serverID)
 	Panic(err)
 }
 
 // UpdateBeat updates an already existing beat in the table
 func (db *Db) UpdateBeat(table Table, serverID int) {
-	query := `update ` + table.String() + ` set ts = now() where id = $1;`
+	query := fmt.Sprintf("update %s set ts = now() where id = $1;", table)
 	_, err := db.conn.Exec(query, serverID)
 	Panic(err)
 }
