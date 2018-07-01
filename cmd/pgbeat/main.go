@@ -6,9 +6,6 @@ import (
 	"github.com/jouir/pgbeat/base"
 	"github.com/jouir/pgbeat/manager"
 	"golang.org/x/crypto/ssh/terminal"
-	"log"
-	"os"
-	"os/signal"
 	"syscall"
 )
 
@@ -59,20 +56,6 @@ func main() {
 		base.Panic(err)
 	}
 
-	done := make(chan bool)
-	beatmaker := manager.NewBeatmaker(config, done)
-
-	// Signal handling
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	signal.Notify(c, syscall.SIGTERM)
-	signal.Notify(c, syscall.SIGINT)
-	go func() {
-		for sig := range c {
-			log.Printf("Received %v signal\n", sig)
-			done <- true
-		}
-	}()
-
+	beatmaker := manager.NewBeatmaker(config)
 	beatmaker.Run()
 }

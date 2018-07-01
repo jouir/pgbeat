@@ -11,16 +11,14 @@ type Beatmaker struct {
 	config   *base.Config
 	db       *base.Db
 	table    *base.Table
-	done     chan bool
 	beat     bool
 	recovery bool
 }
 
 // NewBeatmaker creates a Beatmaker manager
-func NewBeatmaker(config *base.Config, done chan bool) *Beatmaker {
+func NewBeatmaker(config *base.Config) *Beatmaker {
 	return &Beatmaker{
 		config: config,
-		done:   done,
 	}
 }
 
@@ -35,12 +33,9 @@ func (bm *Beatmaker) Run() {
 
 	log.Println("Connecting to database", bm.config.Database)
 	bm.db.Connect()
-	defer bm.terminate()
 
-	// Initial recovery check
+	// Asynchronously checks for recovery mode
 	bm.recovery = bm.db.InRecovery()
-
-	// Further recovery checks in asynchronous mode
 	go bm.checkRecovery()
 
 	if bm.config.CreateTable {
@@ -48,9 +43,7 @@ func (bm *Beatmaker) Run() {
 	}
 
 	bm.beat = bm.db.BeatExists(bm.table, bm.config.ID)
-	go bm.upsertBeat()
-
-	<-bm.done
+	bm.upsertBeat()
 }
 
 // checkRecovery looks for recovery mode and cache this informations
@@ -81,14 +74,9 @@ func (bm *Beatmaker) upsertBeat() {
 	}
 }
 
-// terminate cleans up connection
-func (bm *Beatmaker) terminate() {
-	log.Println("Terminating")
-	bm.db.Disconnect()
-}
-
 // createDatabase connects to instance (with or without database name) and
 // create a database if it doesn't exit
+// it waits for instance to be writable and listens for done channel
 func (bm *Beatmaker) createDatabase(name string) {
 	var dsn string
 	if bm.config.ConnectDatabase != "" {
@@ -100,18 +88,45 @@ func (bm *Beatmaker) createDatabase(name string) {
 
 	log.Println("Connecting to instance to create database")
 	db.Connect()
-	defer db.Disconnect()
 
-	if !db.DatabaseExists(name) {
-		log.Println("Creating database", name)
-		db.CreateDatabase(name)
+	// Asynchronously checks for recovery mode
+	recovery := db.InRecovery()
+	go func() {
+		for {
+			recovery = db.InRecovery()
+			time.Sleep(time.Duration(bm.config.RecoveryInterval*1000) * time.Millisecond)
+		}
+	}()
+
+	// Wait for instance to be writable
+	for {
+		if recovery {
+			log.Println("Not creating database (recovery mode)")
+		} else {
+			if !db.DatabaseExists(name) {
+				log.Println("Creating database", name)
+				db.CreateDatabase(name)
+			}
+			return
+		}
+		time.Sleep(time.Duration(bm.config.Interval*1000) * time.Millisecond)
 	}
 }
 
 // createTable create destination table if it doesn't exist
+// it waits for instance to be writable and listens for done channel
 func (bm *Beatmaker) createTable(table *base.Table) {
-	if !bm.db.TableExists(table) {
-		log.Println("Creating table", table)
-		bm.db.CreateTable(table)
+	// Wait for instance to be writable
+	for {
+		if bm.recovery {
+			log.Println("Not creating table (recovery mode)")
+		} else {
+			if !bm.db.TableExists(table) {
+				log.Println("Creating table", table)
+				bm.db.CreateTable(table)
+			}
+			return
+		}
+		time.Sleep(time.Duration(bm.config.Interval*1000) * time.Millisecond)
 	}
 }

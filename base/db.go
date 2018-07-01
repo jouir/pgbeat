@@ -31,12 +31,6 @@ func (db *Db) Connect() {
 	db.conn = conn
 }
 
-// Disconnect ends connection cleanly
-func (db *Db) Disconnect() {
-	err := db.conn.Close()
-	Panic(err)
-}
-
 // TableExists checks if a table exists
 // Not using SQL "create table if not exists" statement because some users
 // don't have DDL privileges and table could already exists
