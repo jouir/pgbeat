@@ -88,14 +88,21 @@ func (bm *Beatmaker) terminate() {
 	bm.db.Disconnect()
 }
 
-// createDatabase connects to instance without database name and create it if
-// it doesn't exists. libpq uses the same database name as user name by default
-// so ensure at least this database is created before trying to connect
+// createDatabase connects to instance (with or without database name) and
+// create a database if it doesn't exit
 func (bm *Beatmaker) createDatabase(name string) {
-	db := base.NewDb(bm.config.DsnWithoutDatabase())
-	log.Println("Connecting to instance")
+	var dsn string
+	if bm.config.ConnectDatabase != "" {
+		dsn = bm.config.DsnWithDatabase(bm.config.ConnectDatabase)
+	} else {
+		dsn = bm.config.DsnWithoutDatabase()
+	}
+	db := base.NewDb(dsn)
+
+	log.Println("Connecting to instance to create database")
 	db.Connect()
 	defer db.Disconnect()
+
 	if !db.DatabaseExists(name) {
 		log.Println("Creating database", name)
 		db.CreateDatabase(name)

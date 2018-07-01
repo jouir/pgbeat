@@ -25,6 +25,7 @@ type Config struct {
 	ID               int     `yaml:"id"`
 	RecoveryInterval float64 `yaml:"recovery-interval"`
 	CreateDatabase   bool    `yaml:"create-database"`
+	ConnectDatabase  string  `yaml:"connect-database"`
 }
 
 func init() {
@@ -58,15 +59,21 @@ func (c *Config) Read(file string) error {
 
 // Dsn formats a connection string based on Config
 func (c *Config) Dsn() string {
+	return c.DsnWithDatabase(c.Database)
+}
+
+// DsnWithDatabase formats a connection string based on Config and overrides
+// dbname
+func (c *Config) DsnWithDatabase(database string) string {
 	dsn := strings.Split(c.DsnWithoutDatabase(), " ")
 	if c.Database != "" {
-		dsn = append(dsn, fmt.Sprintf("dbname=%s", c.Database))
+		dsn = append(dsn, fmt.Sprintf("dbname=%s", database))
 	}
 	return strings.Join(dsn, " ")
 }
 
-// DsnWithoutDatabase formats a connection string based on config without
-// dbname parameter. Used when database doesn't exist yet.
+// DsnWithoutDatabase formats a connection string based on Config without
+// dbname
 func (c *Config) DsnWithoutDatabase() string {
 	var dsn []string
 	if c.Host != "" {

@@ -11,7 +11,7 @@ Sometimes you need to measure replication lag between a primary and one or more 
 * `pgbeat` uses an identifier (`-id`) associated with its timestamp so multiple daemons can run at the same time on the same instance without overlap.
 * interval unit is seconds (`-interval`, `-recovery-interval`, `-timeout`). Milliseconds can be set using floating point value (ex: 0.25 for 250ms), except for `-timeout` where only integers are accepted.
 * `pgbeat` relies on `libpq` for PostgreSQL connection. When `-host` is ommited, connection via unix socket is used. When `-user` is ommited, the unix user is used. And so on.
-* `pgbeat` is able to create database with `-create-database` if it doesn't exist. At least a database with the same name as username is required to be able to connect successfully if this option is enabled.
+* `pgbeat` is able to create database with `-create-database` if it doesn't exist. A different database name can be specified with `-connect-database` to connect once and create the database (ex: "postgres" or "template1"). By default, libpq uses a database name based on the username to connect but this database might not exist so connection won't be successful.
 * `pgbeat` handles `SIGINT` and `SIGTERM` signals to terminate gracefully.
 * configuration file options **override** command-line arguments.
 
