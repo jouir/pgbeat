@@ -35,6 +35,7 @@ func main() {
 	flag.Float64Var(&config.RecoveryInterval, "recovery-interval", 1, "Time to wait between recovery checks in seconds")
 	flag.BoolVar(&config.CreateDatabase, "create-database", false, "Create database if it does not exist")
 	flag.StringVar(&config.ConnectDatabase, "connect-database", "", "When create-database, connect to this database for creation")
+	flag.BoolVar(&config.CreateTable, "create-table", false, "Create table if it does not exist")
 	flag.Parse()
 
 	if *version {

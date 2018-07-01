@@ -10,10 +10,10 @@ import (
 type Beatmaker struct {
 	config   *base.Config
 	db       *base.Db
+	table    *base.Table
 	done     chan bool
 	beat     bool
 	recovery bool
-	table    *base.Table
 }
 
 // NewBeatmaker creates a Beatmaker manager
@@ -43,9 +43,8 @@ func (bm *Beatmaker) Run() {
 	// Further recovery checks in asynchronous mode
 	go bm.checkRecovery()
 
-	if !bm.db.TableExists(bm.table) {
-		log.Println("Creating table", bm.table)
-		bm.db.CreateTable(bm.table)
+	if bm.config.CreateTable {
+		bm.createTable(bm.table)
 	}
 
 	bm.beat = bm.db.BeatExists(bm.table, bm.config.ID)
@@ -106,5 +105,13 @@ func (bm *Beatmaker) createDatabase(name string) {
 	if !db.DatabaseExists(name) {
 		log.Println("Creating database", name)
 		db.CreateDatabase(name)
+	}
+}
+
+// createTable create destination table if it doesn't exist
+func (bm *Beatmaker) createTable(table *base.Table) {
+	if !bm.db.TableExists(table) {
+		log.Println("Creating table", table)
+		bm.db.CreateTable(table)
 	}
 }

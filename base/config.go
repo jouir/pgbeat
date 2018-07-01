@@ -26,6 +26,7 @@ type Config struct {
 	RecoveryInterval float64 `yaml:"recovery-interval"`
 	CreateDatabase   bool    `yaml:"create-database"`
 	ConnectDatabase  string  `yaml:"connect-database"`
+	CreateTable      bool    `yaml:"create-table"`
 }
 
 func init() {
