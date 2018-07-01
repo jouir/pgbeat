@@ -26,10 +26,14 @@ func NewBeatmaker(config *base.Config, done chan bool) *Beatmaker {
 
 // Run starts the Beatmaker
 func (bm *Beatmaker) Run() {
+	if bm.config.CreateDatabase {
+		bm.createDatabase(bm.config.Database)
+	}
+
 	bm.table = base.NewTable(bm.config.Schema, bm.config.Table)
 	bm.db = base.NewDb(bm.config.Dsn())
 
-	log.Println("Connecting to instance")
+	log.Println("Connecting to database", bm.config.Database)
 	bm.db.Connect()
 	defer bm.terminate()
 
@@ -82,4 +86,18 @@ func (bm *Beatmaker) upsertBeat() {
 func (bm *Beatmaker) terminate() {
 	log.Println("Terminating")
 	bm.db.Disconnect()
+}
+
+// createDatabase connects to instance without database name and create it if
+// it doesn't exists. libpq uses the same database name as user name by default
+// so ensure at least this database is created before trying to connect
+func (bm *Beatmaker) createDatabase(name string) {
+	db := base.NewDb(bm.config.DsnWithoutDatabase())
+	log.Println("Connecting to instance")
+	db.Connect()
+	defer db.Disconnect()
+	if !db.DatabaseExists(name) {
+		log.Println("Creating database", name)
+		db.CreateDatabase(name)
+	}
 }

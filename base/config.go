@@ -24,6 +24,7 @@ type Config struct {
 	Timeout          int     `yaml:"timeout"`
 	ID               int     `yaml:"id"`
 	RecoveryInterval float64 `yaml:"recovery-interval"`
+	CreateDatabase   bool    `yaml:"create-database"`
 }
 
 func init() {
@@ -57,6 +58,16 @@ func (c *Config) Read(file string) error {
 
 // Dsn formats a connection string based on Config
 func (c *Config) Dsn() string {
+	dsn := strings.Split(c.DsnWithoutDatabase(), " ")
+	if c.Database != "" {
+		dsn = append(dsn, fmt.Sprintf("dbname=%s", c.Database))
+	}
+	return strings.Join(dsn, " ")
+}
+
+// DsnWithoutDatabase formats a connection string based on config without
+// dbname parameter. Used when database doesn't exist yet.
+func (c *Config) DsnWithoutDatabase() string {
 	var dsn []string
 	if c.Host != "" {
 		dsn = append(dsn, fmt.Sprintf("host=%s", c.Host))
@@ -69,9 +80,6 @@ func (c *Config) Dsn() string {
 	}
 	if c.Password != "" {
 		dsn = append(dsn, fmt.Sprintf("password=%s", c.Password))
-	}
-	if c.Database != "" {
-		dsn = append(dsn, fmt.Sprintf("dbname=%s", c.Database))
 	}
 	if c.Timeout != 0 {
 		dsn = append(dsn, fmt.Sprintf("connect_timeout=%d", c.Timeout))

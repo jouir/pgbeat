@@ -95,3 +95,22 @@ func (db *Db) InRecovery() (recovery bool) {
 	Panic(err)
 	return recovery
 }
+
+// DatabaseExists checks for database existance
+func (db *Db) DatabaseExists(name string) (exists bool) {
+	query := fmt.Sprintf("select true as result from pg_database where datname = $1 limit 1;")
+	err := db.conn.QueryRow(query, QuoteIdent(name)).Scan(&exists)
+	if err == sql.ErrNoRows {
+		exists = false
+	} else {
+		Panic(err)
+	}
+	return exists
+}
+
+// CreateDatabase creates a database
+func (db *Db) CreateDatabase(name string) {
+	query := fmt.Sprintf("create database %s;", QuoteIdent(name))
+	_, err := db.conn.Exec(query)
+	Panic(err)
+}

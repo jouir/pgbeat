@@ -33,6 +33,7 @@ func main() {
 	flag.IntVar(&config.Timeout, "timeout", 3, "Connection timeout in seconds")
 	flag.IntVar(&config.ID, "id", 1, "Differenciate daemons by using an indentifier")
 	flag.Float64Var(&config.RecoveryInterval, "recovery-interval", 1, "Time to wait between recovery checks in seconds")
+	flag.BoolVar(&config.CreateDatabase, "create-database", false, "Create database if it does not exist")
 	flag.Parse()
 
 	if *version {
