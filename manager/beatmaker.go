@@ -75,8 +75,7 @@ func (bm *Beatmaker) upsertBeat() {
 }
 
 // createDatabase connects to instance (with or without database name) and
-// create a database if it doesn't exit
-// it waits for instance to be writable and listens for done channel
+// create a database if it doesn't exit. It waits for instance to be writable.
 func (bm *Beatmaker) createDatabase(name string) {
 	var dsn string
 	if bm.config.ConnectDatabase != "" {
@@ -114,7 +113,7 @@ func (bm *Beatmaker) createDatabase(name string) {
 }
 
 // createTable create destination table if it doesn't exist
-// it waits for instance to be writable and listens for done channel
+// it waits for instance to be writable
 func (bm *Beatmaker) createTable(table *base.Table) {
 	// Wait for instance to be writable
 	for {
